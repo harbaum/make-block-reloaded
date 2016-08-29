@@ -10,4 +10,4 @@ foundation of a totally rewritten game engine.
 
 Stay tuned ...
 
-![Splash screen](title.png)![Game screen](game.png)
+![Splash screen](title.png) ![Game screen](game.png)
