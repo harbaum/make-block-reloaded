@@ -9,3 +9,5 @@ directly on a Linux PC. This setup simplifies development and is the
 foundation of a totally rewritten game engine.
 
 Stay tuned ...
+
+![Splash screen](title.png)![Game screen](game.png)
