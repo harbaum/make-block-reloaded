@@ -1,9 +1,11 @@
-Ribba-Tetris
-============
+# Make:Block reloaded
 
-This is a Tetris implementation for the Arduino Nano using 300 WS2812B
-LEDs mounted inside an 30x40 cm Ikea Ribba frame.
+This repository contains the source code for the updated Make:Block
+project as published in [Make 04/2016](https://shop.heise.de/katalog/make-block-reloaded).
 
-The Tetris game was designed to be as close to the original Gameboy
-version as possible. The necessary timing information can e.g.
-be found at http://tetrisconcept.net/wiki/Tetris_%28Game_Boy%29
+The `orig` subdirectory contains a Linux environment to run the original
+sketch publsihed in [Make 01/2015](http://www.heise.de/make/inhalt/2015/1/12/)
+directly on a Linux PC. This setup simplifies development and is the 
+foundation of a totally rewritten game engine.
+
+Stay tuned ...
