@@ -74,17 +74,17 @@ static uint8_t config_entry = 2;
 void config_draw_menu(uint8_t sel) {
 
   if(config_audio)
-    config_draw_icon((W-sizeof(audio_on_icon))/2,19,
+    config_draw_icon((W-sizeof(audio_on_icon))/2,14,
 		     audio_on_icon,sizeof(audio_on_icon),6, sel == 0, -1);
   else
-    config_draw_icon((W-sizeof(audio_off_icon))/2,19,
+    config_draw_icon((W-sizeof(audio_off_icon))/2,14,
 		     audio_off_icon,sizeof(audio_off_icon),6, sel == 0, -1);
 
-  config_draw_icon((W-sizeof(brightness_icon))/2,12,
+  config_draw_icon((W-sizeof(brightness_icon))/2,6,
 		   brightness_icon,sizeof(brightness_icon),7, sel==1, 
 		   ((uint16_t)config_brightness * 14) / 255);
 
-  config_draw_icon((W-sizeof(ok_icon))/2,4,
+  config_draw_icon((W-sizeof(ok_icon))/2,0,
 		   ok_icon,sizeof(ok_icon),5, sel == 2, -1);
 }
 
