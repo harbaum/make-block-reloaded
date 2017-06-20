@@ -15,7 +15,8 @@ foundation of a totally rewritten game engine.
 Download the whole repository to your local PC. Make sure the local
 directory is named ```tetris```. Unless you intend to modify the
 splash screen you should remove/rename the file ```bin2c.c``` as
-it seems to interfere with some Windows versions of the Arduino IDE.
+it will be picked up by the Arduino IDE although it's not part of
+the sketch itself.
 
 Open the file ```tetris.ino``` in the Arduino IDE. Then install
 the latest FastLED library e.g. from within the IDE's menu under
