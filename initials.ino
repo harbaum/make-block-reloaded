@@ -1,5 +1,7 @@
 /* 
    initials.ino
+
+   eeprom usage: [20] == magic 0x42, [21..36] = 16 bytes name
 */
 
 #include <FastLED.h>

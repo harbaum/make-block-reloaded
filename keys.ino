@@ -37,6 +37,7 @@ uint8_t keys_any_down() {
 // mode 0 = game, 1 = config, 2 = initials
 uint8_t keys_get(uint8_t mode) {
   uint8_t ret = 0;
+  static uint8_t pause_state = 0;
 
   // rotate key does not repeat
   for(uint8_t i=0;i<5;i++) {
@@ -44,15 +45,8 @@ uint8_t keys_get(uint8_t mode) {
     if((!digitalRead(key_pins[i])) == (!(key_state[i]&1))) {
       key_state[i] &= 1;     // clear all counter bits
       key_state[i] ^= 1;     // toggle state bit 
-      if(key_state[i] & 1) { /* key has just been pressed */
+      if(key_state[i] & 1)   /* key has just been pressed */
 	ret |= 1<<i;
-
-	// check if down is pressed while up (drop) was already pressed
-	// or vice versa
-	if((((1<<i)==KEY_DROP) && !digitalRead(KEY_DOWN_PIN)) ||
-	   (((1<<i)==KEY_DOWN) && !digitalRead(KEY_DROP_PIN))) 
-	  ret |= KEY_PAUSE;
-      }
     } else if(key_state[i] & 1) {
       // key is kept pressed. This will cause some repeat on some keys
 
@@ -84,7 +78,7 @@ uint8_t keys_get(uint8_t mode) {
 	  }
 	}
       } else {
-	// key repear for "initials" enter dialog
+	// key repeat for "initials" enter dialog
 	if(((1<<i) == KEY_DOWN) || ((1<<i) == KEY_DROP)) {
 	  if((!(key_state[i] & 2) && (counter == 24)) ||
 	     ( (key_state[i] & 2) && (counter == 9) )) {
@@ -94,7 +88,24 @@ uint8_t keys_get(uint8_t mode) {
 	}
       }
     }
+
+    // check for special "left/right while fire (rotate)" pause move
+    if((1<<i) == KEY_ROTATE) {
+      if(!(key_state[i] & 1))
+	pause_state = 0;
+    } else if((1<<i) & (KEY_LEFT | KEY_RIGHT)) {
+      if(key_state[i] & 1) {
+	  // any direction is being pressed
+	  pause_state |= 1<<i;
+      }
+    }
   }
+
+  if((pause_state & (KEY_LEFT | KEY_RIGHT | KEY_ROTATE)) == (KEY_LEFT | KEY_RIGHT)) {
+    pause_state |= KEY_ROTATE;
+    ret |= KEY_PAUSE;
+  }
+  
   return ret;
 }
 

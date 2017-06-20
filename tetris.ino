@@ -2,6 +2,7 @@
    tetris.ino
    
    Real tetris for the 15*20 make:block
+   eeprom usage: [0] == magic 0x42, [1..4] = 32 bits hi score
 */
 
 #include <EEPROM.h>
@@ -26,7 +27,7 @@ CRGB leds[NUM_LEDS];
 #define LEVEL_Y   8
 
 // possible game states
-typedef enum { STATE_CONFIG, STATE_TITLE, 
+typedef enum { STATE_CONFIG, STATE_TITLE, STATE_PAUSED,
 	       STATE_GAME, STATE_SCORE, STATE_INITIALS } state_t;
 
 state_t state;
@@ -368,6 +369,31 @@ void game_draw_score() {
   }
 }
 
+static const uint8_t pause_icon[] PROGMEM = {
+  0x00, 0x7c, 0x14, 0x14, 0x08, 0x00
+};
+
+void game_pause() {
+  // make whole game area darker
+  for(uint8_t y=0;y<GAME_H;y++) { 
+    for(uint8_t x=0;x<GAME_W;x++) {
+      LED(x+GAME_X,GAME_Y+y)[0] = LED(x+GAME_X,GAME_Y+y)[0] >> 1;
+      LED(x+GAME_X,GAME_Y+y)[1] = LED(x+GAME_X,GAME_Y+y)[1] >> 1;
+      LED(x+GAME_X,GAME_Y+y)[2] = LED(x+GAME_X,GAME_Y+y)[2] >> 1;
+    }
+  }
+
+  // and overlay "P"
+  for(uint8_t y=0;y<7;y++) { 
+    for(uint8_t x=0;x<sizeof(pause_icon);x++) {
+      if(pgm_read_byte(pause_icon+x) & (0x80>>y))
+	LED(2+x+GAME_X,6+GAME_Y+y) = CRGB::MediumPurple;
+      else
+	LED(2+x+GAME_X,6+GAME_Y+y) = CRGB::White;      
+    }
+  }
+}
+
 uint8_t game_process(uint8_t keys) {
   static const uint8_t score_step[] = { 4, 10, 30, 120 };
 
@@ -432,11 +458,6 @@ uint8_t game_process(uint8_t keys) {
       game_tetromino_new();
     }
   } else {
-    if(keys & KEY_PAUSE) {
-      keys &= ~(KEY_DOWN | KEY_DROP);
-      keys_lock();
-    }
-  
     // advance tetromino manually
     int8_t x=0, y=0, rot=0;
     if(keys & KEY_LEFT)   x--;
@@ -507,6 +528,15 @@ uint8_t game_process(uint8_t keys) {
       for(uint8_t x=0;x<GAME_W;x++) 
 	LED(x+GAME_X,GAME_Y+y) =
 	  CRGB(tetromino_colors[game_tetromino_get_block(x, y)]);
+  }
+    
+  // check if user just pressed pause key 
+  if(keys & KEY_PAUSE) {
+    game_pause();
+      
+    // pause key has just been pressed
+    state = STATE_PAUSED;
+    keys_lock();
   }
 
   game_draw_score();
@@ -590,6 +620,12 @@ void loop() {
 	game_init();
 	state = STATE_GAME;
       }
+      break;
+
+    case STATE_PAUSED:
+      // fire key unpauses
+      if(keys & KEY_ROTATE)
+	state = STATE_GAME;
       break;
       
     case STATE_GAME:
