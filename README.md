@@ -10,7 +10,22 @@ foundation of a totally rewritten game engine.
 
 ![Splash screen](title.png) ![Game screen](game.png)
 
+## Hardware
+
+The final hardware cosist of an Arduino Nano and 300 WS2812B
+LED arranged in a 20*15 grid. The LEDs are to be connected
+to arduino port D12, the left button to port D5, the right button
+to port D6, the drop (up) button to port D7, the down button to
+port D8 and the rotate (fire) button to port D11. A speaker may
+be connected to port D9.
+
+Holding a key during power-up will bring up a config menu. Moving
+left/right during gameplay while holding down the fire button
+pauses the game.
+
 ## Compilation
+
+### For Arduino
 
 Download the whole repository to your local PC. Make sure the local
 directory is named ```tetris```. Unless you intend to modify the
@@ -23,4 +38,13 @@ the latest FastLED library e.g. from within the IDE's menu under
 "sketch->install libraries". The FastLED lib is found in the "display"
 section.
 
-Now simply hit the build button. 
+Now simply hit the build button.
+
+### For Linux PC
+
+This sketch can run natively on a Linux PC (that's what has been
+used to create the screenshots above).
+
+Simple enter  ```make``` to build the Linux version. You might need
+to install libsdl. They keys are mapped to right shift and the cursor
+keys.
