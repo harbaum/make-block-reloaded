@@ -374,6 +374,9 @@ static const uint8_t pause_icon[] PROGMEM = {
 };
 
 void game_pause() {
+  // mute audio while paused
+  audio_set(128);
+	    
   // make whole game area darker
   for(uint8_t y=0;y<GAME_H;y++) { 
     for(uint8_t x=0;x<GAME_W;x++) {
