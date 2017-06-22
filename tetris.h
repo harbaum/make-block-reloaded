@@ -7,7 +7,7 @@
 
 // enable LED_SERPENTINE if the stripe wiring used
 // alternating directions
-#define LED_SERPENTINE
+// #define LED_SERPENTINE
 
 #ifndef LED_SERPENTINE
 #define LED(x,y)  leds[H-(y)-1+H*(x)]

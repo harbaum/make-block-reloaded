@@ -415,7 +415,7 @@ void game_pause(int8_t store) {
   for(uint8_t y=0;y<7;y++) { 
     for(uint8_t x=0;x<sizeof(pause_icon);x++) {
       if(pgm_read_byte(pause_icon+x) & (0x80>>y))
-	LED(2+x+GAME_X,6+GAME_Y+y) = CRGB::MediumPurple;
+	LED(2+x+GAME_X,6+GAME_Y+y) = CRGB::Purple;
       else
 	LED(2+x+GAME_X,6+GAME_Y+y) = CRGB::White;      
     }

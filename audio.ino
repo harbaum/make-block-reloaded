@@ -34,7 +34,7 @@ void audio_init() {
   TCCR1C = 0;
 }
 
-void audio_set(uint8_t ocr) {
+void audio_set(uint16_t ocr) {
   if((ocr==128) || !audio_is_enabled)
     TCCR1A = 0;              // output off
   else {
