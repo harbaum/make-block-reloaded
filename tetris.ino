@@ -181,6 +181,23 @@ char game_tetromino_ok() {
   return true;
 }
 
+void game_tetromino_preview_draw(uint8_t type) {
+  // erase 4*2 preview area
+  for(uint8_t y=0;y<2;y++)
+    for(uint8_t x=0;x<4;x++)
+      LED(PREVIEW_X+x-1, PREVIEW_Y-y) =
+	CRGB::Black;
+  
+  if(type != 0xff) {
+    int8_t const (*p)[2] = tetrominos[type][0];
+    for(uint8_t i=0;i<4;i++) {
+      uint32_t c = pgm_read_dword_near(tetromino_colors + type + 1);
+      LED(PREVIEW_X+(int8_t)pgm_read_byte(&p[i][0]),
+	  (PREVIEW_Y-(int8_t)pgm_read_byte(&p[i][1]))) = CRGB(c);
+    }
+  }
+}
+
 void game_tetromino_new() {
   game.tetromino.rot = 0;
   game.tetromino.type = game.tetromino.next;
@@ -191,24 +208,15 @@ void game_tetromino_new() {
   // game area ...
   game.tetromino.y = GAME_H-2;
 
-  // erase 4*2 preview area
-  for(uint8_t y=0;y<2;y++)
-    for(uint8_t x=0;x<4;x++)
-      LED(PREVIEW_X+x-1, PREVIEW_Y-y) =
-	CRGB::Black;
-
   // check if new tetromino can be placed on screen
   if(game_tetromino_ok()) {
     game_tetromino_draw(true);
-
+    
     // and show next tetromino
-    int8_t const (*p)[2] = tetrominos[game.tetromino.next][0];
-    for(uint8_t i=0;i<4;i++) {
-      uint32_t c = pgm_read_dword_near(tetromino_colors + game.tetromino.next + 1);
-      LED(PREVIEW_X+(int8_t)pgm_read_byte(&p[i][0]),
-	  (PREVIEW_Y-(int8_t)pgm_read_byte(&p[i][1]))) = CRGB(c);
-    }
+    game_tetromino_preview_draw(game.tetromino.next);
   } else {
+    game_tetromino_preview_draw(0xff);
+
     // set current tetromino to 0xff indicating that
     // no game is in progress anymore
     game.tetromino.type = 0xff;
@@ -379,10 +387,21 @@ static const uint8_t pause_icon[] PROGMEM = {
   0x00, 0x7c, 0x14, 0x14, 0x08, 0x00
 };
 
-void game_pause() {
-  // mute audio while paused
-  audio_set(128);
-	    
+void game_pause(int8_t store) {
+
+  // save in eeprom. Don't save when restoring
+  // a pause state from eeprom
+  if(store) {
+    // save game state in eeprom
+    EEPROM.write(40, 0x42);   // write magic marker
+    EEPROM.put(41, game);     // write game state
+
+    // mute audio while paused. Only do this when
+    // paused from within the running game and not
+    // when restoring a pause state.
+    audio_set(128);	    
+  }
+    
   // make whole game area darker
   for(uint8_t y=0;y<GAME_H;y++) { 
     for(uint8_t x=0;x<GAME_W;x++) {
@@ -400,6 +419,21 @@ void game_pause() {
       else
 	LED(2+x+GAME_X,6+GAME_Y+y) = CRGB::White;      
     }
+  }
+}
+
+void game_area_blit(void) {
+  
+  for(uint8_t y=0;y<GAME_H;y++) { 
+    if((game.row_remove & (1<<y)) && (game.row_remove_timer & 16))
+      for(uint8_t x=0;x<GAME_W;x++)
+	LED(x+GAME_X,GAME_Y+y) = CRGB::White;
+    else
+      for(uint8_t x=0;x<GAME_W;x++) {
+	uint32_t c = pgm_read_dword_near(tetromino_colors +
+					 game_tetromino_get_block(x, y));
+	LED(x+GAME_X,GAME_Y+y) = CRGB(c);
+      }
   }
 }
 
@@ -529,21 +563,13 @@ uint8_t game_process(uint8_t keys) {
   }
 
   // blit game_area to screen
-  for(uint8_t y=0;y<GAME_H;y++) { 
-    if((game.row_remove & (1<<y)) && (game.row_remove_timer & 16))
-      for(uint8_t x=0;x<GAME_W;x++)
-	LED(x+GAME_X,GAME_Y+y) = CRGB::White;
-    else
-      for(uint8_t x=0;x<GAME_W;x++) {
-	uint32_t c = pgm_read_dword_near(tetromino_colors +
-					 game_tetromino_get_block(x, y));
-	LED(x+GAME_X,GAME_Y+y) = CRGB(c);
-      }
-  }
+  game_area_blit();
     
   // check if user just pressed pause key 
   if(keys & KEY_PAUSE) {
-    game_pause();
+    // go into pause state and save game
+    // state to eeprom
+    game_pause(1);
       
     // pause key has just been pressed
     state = STATE_PAUSED;
@@ -592,6 +618,25 @@ void setup() {
       title_init();
       state = STATE_TITLE;
     }
+
+    // check for a save state
+    if(EEPROM.read(40) == 0x42) {
+      game_init();
+
+      // read game state from eeprom
+      EEPROM.get(41, game);
+      
+      // update preview and level as loaded from save state
+      game_tetromino_preview_draw(game.tetromino.next);
+      game_show_level();
+
+      // draw game area once      
+      game_area_blit();
+      game_pause(0);
+
+      // and go into paused state
+      state = STATE_PAUSED;
+    }    
   }
 
   song_init();
@@ -634,9 +679,14 @@ void loop() {
       break;
 
     case STATE_PAUSED:
+      // score still scrolls
+      game_draw_score();
+      
       // fire key unpauses
-      if(keys & KEY_ROTATE)
+      if(keys & KEY_ROTATE) {
+	EEPROM.write(40, 0x00);   // clear magic save state marker
 	state = STATE_GAME;
+      }
       break;
       
     case STATE_GAME:
