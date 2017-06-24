@@ -95,7 +95,7 @@ static const int8_t tetrominos[][4][4][2] PROGMEM = {  {
 
 // ------------------- the entire in-game state ------------
 
-struct {
+struct gameS {
   uint8_t step_cnt;
   uint8_t level;
   uint32_t score;
