@@ -23,6 +23,8 @@ Holding a key during power-up will bring up a config menu. Moving
 left/right during gameplay while holding down the fire button
 pauses the game.
 
+![Splash screen](foto_title.jpg) ![Game screen](foto_game.jpg)
+
 ## Compilation
 
 ### For Arduino
@@ -48,3 +50,4 @@ used to create the screenshots above).
 Simple enter  ```make``` to build the Linux version. You might need
 to install libsdl. They keys are mapped to right shift and the cursor
 keys.
+
