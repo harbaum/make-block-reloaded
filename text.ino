@@ -1,5 +1,6 @@
+// -*-c-*-
 #include <FastLED.h>
-#include "tetris.h"
+#include "makeblock.h"
 
 // extremely tiny font
 const uint8_t font[][5] PROGMEM = {
@@ -30,7 +31,7 @@ const uint8_t font[][5] PROGMEM = {
   { 0b000011, 0b011100, 0b000011, 0b000000, 0b000000 },  // Y
   { 0b011001, 0b010101, 0b010011, 0b000000, 0b000000 },  // Z
   { 0b001110, 0b010001, 0b001110, 0b000000, 0b000000 },  // 0
-  { 0b000010, 0b011111, 0b000000, 0b000000, 0b000000 },  // 1
+  { 0b010010, 0b011111, 0b010000, 0b000000, 0b000000 },  // 1
   { 0b011001, 0b010101, 0b010010, 0b000000, 0b000000 },  // 2
   { 0b010001, 0b010101, 0b001010, 0b000000, 0b000000 },  // 3
   { 0b001100, 0b001010, 0b011111, 0b000000, 0b000000 },  // 4
@@ -67,11 +68,11 @@ uint8_t text_draw_char(char chr, int8_t x, int8_t y, int8_t skip, uint8_t len, C
   else if(chr == 2) p = font['Z'-'A'+14];
   else return l+3;
 
-  while(pgm_read_byte(p) && (l<5)) {
+  while(pgm_read_byte_near(p) && (l<5)) {
     if(skip > 0) skip--;
     else if(len > 0) {
       for(uint8_t b=0;b<6;b++)
-	if(pgm_read_byte(p) & (0x20>>b)) 
+	if(pgm_read_byte_near(p) & (0x20>>b)) 
 	  text_draw_pixel(x, y+b-1, c);
     }
     
@@ -95,7 +96,7 @@ uint8_t text_char_width(char chr) {
   else if(chr == 2) p = font['Z'-'A'+14];
   else return 3;
 
-  while(pgm_read_byte(p++) && (x<5)) x++;
+  while(pgm_read_byte_near(p++) && (x<5)) x++;
   return x+1;
 }
 

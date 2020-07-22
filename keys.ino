@@ -1,4 +1,5 @@
-#include "tetris.h"
+// -*-c-*-
+#include "makeblock.h"
 
 // bit 0 = last state
 // bit 1 = repeat state
@@ -56,27 +57,39 @@ uint8_t keys_get(uint8_t mode) {
 
       uint8_t counter = key_state[i]>>2;
 
-      // repeat for horizontal movement
-      if(((1<<i) == KEY_LEFT) || ((1<<i)==KEY_RIGHT)) {
-	// "DAS" delay of 24 Frames according to tetris concept
-	// afterwards 1/9G
-	if((!(key_state[i] & 2) && (counter == 24)) ||
-	   ( (key_state[i] & 2) && (counter == 9) && (mode != 1)) ||
-	   ( (key_state[i] & 2) && (counter == 1) && (mode == 1))) {
-	  key_state[i] = 3;   // restart counter for continous repeat
-	  ret |= 1<<i;        // report key
-	}
-      }
-
-      // mode = 0/1 = normal game mode
-      if(mode != 2) {
-	// "soft drop"
-	if((1<<i) == KEY_DOWN) {
-	  if(counter == 3) {    // 1/3G
+      if(game.game == GAME_TETRIS) {      
+	// repeat for horizontal movement
+	if(((1<<i) == KEY_LEFT) || ((1<<i)==KEY_RIGHT)) {
+	  // "DAS" delay of 24 Frames according to tetris concept
+	  // afterwards 1/9G
+	  if((!(key_state[i] & 2) && (counter == 24)) ||
+	     ( (key_state[i] & 2) && (counter == 9) && (mode != 1)) ||
+	     ( (key_state[i] & 2) && (counter == 1) && (mode == 1))) {
 	    key_state[i] = 3;   // restart counter for continous repeat
 	    ret |= 1<<i;        // report key
 	  }
 	}
+      } else {
+	// mario does not have a repeat
+	if(!(key_state[i] & 2) && (((1<<i) == KEY_LEFT) || ((1<<i)==KEY_RIGHT)))
+	  ret |= 1<<i;
+      }
+	
+      // mode = 0/1 = normal game mode
+      if(mode != 2) {
+	if(game.game == GAME_TETRIS) {      
+	  // "soft drop"
+	  if((1<<i) == KEY_DOWN) {
+	    if(counter == 3) {    // 1/3G
+	      key_state[i] = 3;   // restart counter for continous repeat
+	      ret |= 1<<i;        // report key
+	    }
+	  }
+	} else
+	  // mario does not have a repeat
+	  if(!(key_state[i] & 2) && (((1<<i) == KEY_DOWN) || ((1<<i) == KEY_ROTATE)))
+	    ret |= 1<<i;        // report key
+	
       } else {
 	// key repeat for "initials" enter dialog
 	if(((1<<i) == KEY_DOWN) || ((1<<i) == KEY_DROP)) {

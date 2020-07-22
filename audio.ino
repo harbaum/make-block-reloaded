@@ -1,3 +1,4 @@
+// -*-c-*-
 // audio.ino
 //
 // audio routines for the make:block:xl tetris
@@ -40,6 +41,9 @@ void audio_set(uint16_t ocr) {
   else {
     TCCR1A = (1<<COM1A0);    // ocr toggle mode
     TCNT1 = 0;
-    OCR1A = ocr;
+    if(ocr == 129)   // hack for C6
+      OCR1A = 119;
+    else
+      OCR1A = ocr;
   }
 }

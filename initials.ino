@@ -1,12 +1,14 @@
+// -*-c-*-
 /* 
    initials.ino
 
-   eeprom usage: [20] == magic 0x42, [21..36] = 16 bytes name
+   eeprom usage: [20] == magic 0x42, [21..36] = 16 bytes name, tetris
+                 [40] == magic 0x42, [21..36] = 16 bytes name, mario
 */
 
 #include <FastLED.h>
 #include <EEPROM.h>
-#include "tetris.h"
+#include "makeblock.h"
 
 #define INITIALS_BACK  1
 #define INITIALS_DONE  2
@@ -57,15 +59,17 @@ void initials_entry_draw() {
 }
 
 void initials_init(uint32_t score) {
+  uint8_t name_base = (!game.game)?20:40;  // eeprom address for tetris and mario
+  
   LEDS.clear();
   LEDS.setBrightness(config_brightness);
 
   // load previous name from eeprom
   // this is stored from byte 20 to 36
   memset(initials_str, 0, 16);
-  if(EEPROM.read(20) == 0x42) {
+  if(EEPROM.read(name_base) == 0x42) {
     for(uint8_t i=0;i<15;i++)
-      EEPROM.get(21+i, initials_str[i]);
+      EEPROM.get(name_base+1+i, initials_str[i]);
   } else
     strcpy(initials_str, "A");
 
@@ -80,6 +84,8 @@ void initials_init(uint32_t score) {
 }
 
 uint8_t initials_process(uint8_t keys) {
+  uint8_t name_base = (!game.game)?20:40;  // eeprom address for tetris and mario
+
   // some colorful animation ...
   static uint8_t coff = 0;
   initials_colorbar(INITIALS_SCORE_Y-2, coff);
@@ -134,9 +140,9 @@ uint8_t initials_process(uint8_t keys) {
       for(uint8_t i=initials_cur_chr;i<16;i++)
 	initials_str[i] = 0;
 
-      EEPROM.write(20, 0x42);   // write magic marker
+      EEPROM.write(name_base, 0x42);   // write magic marker
       for(uint8_t i=0;i<15;i++)
-	EEPROM.put(21+i, initials_str[i]);
+	EEPROM.put(name_base+1+i, initials_str[i]);
 
       return 1;
     }

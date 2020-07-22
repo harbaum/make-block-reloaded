@@ -1,9 +1,10 @@
+// -*-c-*-
 /* 
    score.ino
 */
 
 #include <FastLED.h>
-#include "tetris.h"
+#include "makeblock.h"
 
 static char score_msg[] = "NEW HI SCORE: xxxxxxx";
 static char *score_ptr;

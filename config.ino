@@ -1,10 +1,11 @@
+// -*-c-*-
 /* 
    config.ino
 */
 
 #include <FastLED.h>
 #include <EEPROM.h>
-#include "tetris.h"
+#include "makeblock.h"
 
 #define MIN_BRIGHTNESS  16   // too dark would be bad as config itself becomes invisible
 #define MAX_BRIGHTNESS  255
@@ -53,7 +54,7 @@ void config_draw_icon(uint8_t x, uint8_t y, const uint8_t *d, uint8_t cnt,
   for(i=0;i<W;i++) {
     uint8_t pat = 0;
     if((i >= x) && (i < x+cnt))
-      pat = pgm_read_byte(d+i-x);
+      pat = pgm_read_byte_near(d+i-x);
 
     for(j=0;j<h;j++) {
       // background is dark grey or black (if icon is selected or not)

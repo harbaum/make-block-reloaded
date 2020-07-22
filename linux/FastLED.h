@@ -40,6 +40,7 @@ uint8_t gkey = 0;
 static CRGB *m_data = NULL;
 static int m_size;
 static int m_scale;
+static int m_zero = 0;
 
 class CFastLED {
 public:
@@ -83,6 +84,7 @@ public:
 #endif
 
     delay(500);
+    return m_zero;
   };
 
   void setBrightness(uint8_t scale) { 

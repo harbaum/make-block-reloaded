@@ -5,7 +5,7 @@
 #include <cmath>
 #include <assert.h>
 
-#include "tetris.h"
+#include "makeblock.h"
 #include "FastLED.h"
 
 // required for compatibility with FastLED 3.0
@@ -92,6 +92,8 @@ void audio_set(uint16_t ocr) {
     return;
   }
 
+  if(ocr == 129) ocr = 119;  // Hack for C6
+  
   b->beep(F_CPU/(2 * AUDIO_PRESCALER  * (ocr + 0.5))); 
 }
 
@@ -146,6 +148,11 @@ extern const TProgmemRGBPalette16 RainbowColors_p PROGMEM = {
     0x5500AB, 0x7F0081, 0xAB0055, 0xD5002B
 };
 
+extern state_t state;
+extern void game_pause(int8_t store);
+
+extern const struct mario_levelS level_1_1;
+
 #include "FastLED/colorutils.cpp"
 #include "FastLED/hsv2rgb.cpp"
 
@@ -159,6 +166,9 @@ extern const TProgmemRGBPalette16 RainbowColors_p PROGMEM = {
 #include "title.ino"
 #include "score.ino"
 #include "tetris.ino"
+#include "mario.ino"
+#include "mario_lvl.ino"
+#include "make-block-reloaded.ino"
 
 int main(int argc, char **argv) {
   if(argc != 1)
