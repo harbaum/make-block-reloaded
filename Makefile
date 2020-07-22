@@ -1,8 +1,8 @@
 # Makefile
 
-APP=tetris
+APP=makeblock
 
-$(APP): linux/main.cpp linux/FastLED.h $(APP).ino logo.ino text.ino mario.ino mario_lvl.ino title.ino makeblock.h keys.ino score.ino audio.ino song.ino config.ino initials.ino makeblock.ino linux/EEPROM.h
+$(APP): linux/main.cpp linux/FastLED.h logo.ino text.ino mario.ino mario_lvl.ino title.ino makeblock.h keys.ino score.ino audio.ino song.ino config.ino initials.ino make-block-reloaded.ino linux/EEPROM.h
 	g++ -o $@ linux/main.cpp -fno-exceptions -I. -Ilinux `sdl-config --cflags --libs`
 
 tools/bin2c: tools/bin2c.c
