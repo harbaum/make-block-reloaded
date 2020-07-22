@@ -10,6 +10,12 @@ foundation of a totally rewritten game engine.
 
 ![Splash screen](title.png) ![Game screen](game.png)
 
+The latest version includes a second game featuring a red dot
+inspired by an italian plumber. The game can be selected in
+the main title screen.
+
+![Splash screen](mario_title.png) ![Game screen](mario_game.png)
+
 ## Hardware
 
 The final hardware cosist of an Arduino Nano and 300 WS2812B
