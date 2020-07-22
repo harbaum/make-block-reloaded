@@ -36,15 +36,12 @@ pauses the game.
 ### For Arduino
 
 Download the whole repository to your local PC. Make sure the local
-directory is named ```tetris```. Unless you intend to modify the
-splash screen you should remove/rename the file ```bin2c.c``` as
-it will be picked up by the Arduino IDE although it's not part of
-the sketch itself.
+directory is named ```make-block-reloaded```.
 
-Open the file ```tetris.ino``` in the Arduino IDE. Then install
-the latest FastLED library e.g. from within the IDE's menu under
-"sketch->install libraries". The FastLED lib is found in the "display"
-section.
+Open the file ```make-block-reloaded.ino``` in the Arduino IDE. Then
+install the latest FastLED library e.g. from within the IDE's menu
+under "sketch->install libraries". The FastLED lib is found in the
+"display" section.
 
 Now simply hit the build button.
 
